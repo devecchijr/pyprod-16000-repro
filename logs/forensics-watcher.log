@@ -1,0 +1,8 @@
+Forensic watcher (20 snapshots/second on /usr/irissys/mgr/Temp during a failing load):
+- zero stat snapshots captured for any *.xml temp file
+- zero file copies captured
+- temp dir empty after the load (no leak)
+Conclusion: the temp file reported in ERROR #16008 is NEVER created on disk.
+Host kernel: 6.10.14-linuxkit (Docker Desktop VM). io_uring_disabled=0.
+messages.log: no new lines during the failing load.
+seccomp: failure also reproduces with --security-opt seccomp=unconfined.

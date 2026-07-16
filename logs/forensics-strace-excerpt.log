@@ -1,0 +1,37 @@
+738-1366  openat(AT_FDCWD, "/usr/local/lib/python3.12/dist-packages/intersystems_pyprod/_production_connector.py", O_RDONLY|O_CLOEXEC) = 7
+739-1366  newfstatat(AT_FDCWD, "/usr/local/lib/python3.12/dist-packages/intersystems_pyprod/_production_connector.py", {st_mode=S_IFREG|0644, st_size=37306, ...}, 0) = 0
+740:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+741:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+742:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0xfffff28b0e20, 0) = -1 ENOENT (No such file or directory)
+743:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0xfffff28b0e20, 0) = -1 ENOENT (No such file or directory)
+744:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+745:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+746:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0xfffff28afee8, 0) = -1 ENOENT (No such file or directory)
+747:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+748:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0xfffff28b0e20, 0) = -1 ENOENT (No such file or directory)
+749:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0xfffff28b0d50, 0) = -1 ENOENT (No such file or directory)
+750:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_RDWR|O_NOCTTY|O_NONBLOCK) = -1 ENOENT (No such file or directory)
+751:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0xfffff28b0c60, 0) = -1 ENOENT (No such file or directory)
+752:1366  unlinkat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0) = -1 ENOENT (No such file or directory)
+753:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_WRONLY|O_CREAT, 0777) = 7
+754:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", {st_mode=S_IFREG|0755, st_size=1325, ...}, 0) = 0
+755:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", {st_mode=S_IFREG|0755, st_size=1325, ...}, 0) = 0
+756:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_RDWR|O_NOCTTY|O_NONBLOCK) = 7
+757:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_RDONLY) = 7
+758:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", {st_mode=S_IFREG|0755, st_size=1325, ...}, 0) = 0
+759:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_RDONLY|O_NOCTTY|O_NONBLOCK) = 7
+760:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_RDONLY) = 7
+761:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", {st_mode=S_IFREG|0755, st_size=1325, ...}, 0) = 0
+762:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_RDONLY|O_NOCTTY|O_NONBLOCK) = 7
+763:1366  openat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", O_RDONLY) = 7
+764:1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", {st_mode=S_IFREG|0755, st_size=1325, ...}, 0) = 0
+765-1366  newfstatat(AT_FDCWD, "/usr/irissys/bin/libiriscc.so", {st_mode=S_IFREG|0755, st_size=414520, ...}, 0) = 0
+766-1366  openat(AT_FDCWD, "/usr/irissys/bin/libiriscc.so", O_RDONLY|O_CLOEXEC) = 7
+767-1366  openat(AT_FDCWD, "/usr/irissys/bin/libiriscom.so", O_RDONLY|O_CLOEXEC) = 7
+768-1366  openat(AT_FDCWD, "/usr/irissys/bin/libxerces-c-3.2.so", O_RDONLY|O_CLOEXEC) = 7
+--
+772-1366  openat(AT_FDCWD, "Registry.XML", O_WRONLY|O_CREAT|O_TRUNC, 0666) = 7
+773-1366  openat(AT_FDCWD, "Registry.XML", O_RDONLY) = 7
+774:1366  unlinkat(AT_FDCWD, "/usr/irissys/mgr/Temp/f7MIhzfoep6YYg.xml", 0) = 0
+775-1366  newfstatat(AT_FDCWD, "/usr/irissys/mgr/irissecurity/", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+776-1366  +++ exited with 0 +++

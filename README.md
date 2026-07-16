@@ -77,11 +77,41 @@ Observations that may help locate the fault:
 - `loader_exit=0` in every failing log: `intersystems_pyprod` prints the error
   but **exits 0**, so a CI step (`bash -e`) does not fail on it.
 
+## Forensics — where exactly it breaks
+
+`./probe-forensics.sh` captures the failure point with strace + a 20 Hz watch
+on `/usr/irissys/mgr/Temp`. On this host the syscall timeline
+(`logs/forensics-strace-excerpt.log`) shows, **in a single process, in program
+order**:
+
+```
+openat("…/Temp/<name>.xml", O_RDWR|O_NOCTTY|O_NONBLOCK) = -1 ENOENT   ← "save text" open, NO O_CREAT → #16008 fires here
+unlinkat("…/Temp/<name>.xml")                            = -1 ENOENT   ← cleanup of a file that never existed
+openat("…/Temp/<name>.xml", O_WRONLY|O_CREAT, 0777)      = 7           ← 3 syscalls LATER the file IS created…
+newfstatat(… st_size=1325 …)                             = 0           ← …and fully written (the UDL)
+openat("…/Temp/<name>.xml", O_RDWR|O_NOCTTY|O_NONBLOCK)  = 7           ← subsequent opens succeed
+```
+
+So `ERROR #16008 "Unable to save text"` is literal: the read/write open of the
+temp file happens **before** the create+write step, fails with `ENOENT`, and by
+the time the file is actually materialized the error has already been raised —
+an ordering issue in the temp-file handoff that is environment-sensitive
+(triggers under Docker Desktop's LinuxKit kernel, apparently not on native
+Linux runners).
+
+Also ruled out on this host (all captured in `logs/forensics-watcher.log`):
+
+- **seccomp** — reproduces identically with `--security-opt seccomp=unconfined`;
+- **io_uring** — `io_uring_disabled=0` and the loader makes zero io_uring calls;
+- **instance-side errors** — `messages.log` gains no lines during the failing load;
+- **file leak** — `mgr/Temp` is empty after the load.
+
 ## Repository layout
 
 ```
 repro.sh                one-command reproduction (disposable container, verdict, cleanup)
 run-matrix.sh           runs the evidence matrix and captures logs/ per cell
+probe-forensics.sh      strace + temp-dir watcher — pinpoints the failing syscall
 assets/merge.cpf        CI-identical instance prep (ENSEMBLE + Interop + CallIn)
 assets/interop_example.py  the 8-line component from the issue
 logs/                   proof logs per matrix cell + SUMMARY.txt
