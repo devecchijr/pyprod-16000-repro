@@ -9,7 +9,7 @@
 #
 # Usage:
 #   ./repro.sh [arch] [source] [user] [startup]
-#     arch    = arm64 (default) | amd64      (amd64 is emulated on Apple Silicon)
+#     arch    = auto (default: matches the host) | arm64 | amd64
 #     source  = pypi (default)  | main       (main = GitHub tarball of pyprod)
 #     user    = root (default)  | irisowner  (pyprod CI runs as root: --user 0:0)
 #     startup = entrypoint (default) | cistart
@@ -20,7 +20,14 @@
 # Exit codes: 0 = reproduced · 2 = not reproduced · 1 = test infrastructure failure.
 set -euo pipefail
 
-ARCH="${1:-arm64}"; SOURCE="${2:-pypi}"; RUNAS="${3:-root}"; START="${4:-entrypoint}"
+ARCH="${1:-auto}"; SOURCE="${2:-pypi}"; RUNAS="${3:-root}"; START="${4:-entrypoint}"
+if [ "$ARCH" = "auto" ]; then
+  case "$(uname -m)" in
+    arm64|aarch64) ARCH=arm64 ;;
+    x86_64|amd64)  ARCH=amd64 ;;
+    *) echo "unsupported host arch: $(uname -m) — pass arm64|amd64 explicitly"; exit 1 ;;
+  esac
+fi
 IMG="intersystems/iris-community:2026.1"
 NAME="pyprod-16000-repro"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

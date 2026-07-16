@@ -11,7 +11,14 @@
 # Requires Docker only (strace is installed inside the disposable container).
 set -euo pipefail
 
-ARCH="${1:-arm64}"
+ARCH="${1:-auto}"
+if [ "$ARCH" = "auto" ]; then
+  case "$(uname -m)" in
+    arm64|aarch64) ARCH=arm64 ;;
+    x86_64|amd64)  ARCH=amd64 ;;
+    *) echo "unsupported host arch: $(uname -m) — pass arm64|amd64 explicitly"; exit 1 ;;
+  esac
+fi
 IMG="intersystems/iris-community:2026.1"
 NAME="pyprod-16000-forensics"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -73,5 +80,6 @@ echo "────────────────────────�
 echo "Key finding (see logs/forensics-strace-excerpt.log):"
 grep -E "O_RDWR\|O_NOCTTY|O_CREAT|unlinkat" "$HERE/logs/forensics-strace-excerpt.log" | head -6
 echo
-echo "Watcher: $(head -3 "$HERE/logs/forensics-watcher.log" | tail 2>/dev/null || true)"
+echo "Watcher summary:"
+head -3 "$HERE/logs/forensics-watcher.log"
 echo "Logs written to logs/forensics-*.log"

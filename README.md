@@ -31,7 +31,8 @@ each dimension is a flag of `repro.sh`:
 
 ```bash
 ./repro.sh [arch] [source] [user] [startup]
-#           arm64|amd64  pypi|main  root|irisowner  entrypoint|cistart
+#           auto*|arm64|amd64  pypi|main  root|irisowner  entrypoint|cistart
+#           (*default: auto-detects the host architecture)
 ```
 
 | Variable | Values tested | Result on Docker Desktop for macOS |
