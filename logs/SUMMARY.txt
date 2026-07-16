@@ -1,0 +1,6 @@
+arm64 pypi root entrypoint → REPRODUCED
+arm64 main root entrypoint → REPRODUCED
+arm64 pypi irisowner entrypoint → REPRODUCED
+arm64 pypi root cistart → REPRODUCED
+amd64 pypi root entrypoint → REPRODUCED
+amd64 main root cistart → REPRODUCED
