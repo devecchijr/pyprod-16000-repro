@@ -7,20 +7,27 @@
 # superuser/SYS), runs the minimal loader from the issue, prints the verdict,
 # and removes everything on exit. Nothing on your machine is touched.
 #
+# ROOT CAUSE (solved 2026-07-17): the failure is triggered by the ABSENCE of
+# the COMLIB environment variable (COMLIB=/usr/irissys/bin). With it set, the
+# LoadStream path works everywhere. This script now doubles as a regression
+# test: run with comlib=off (default) to see the failure, comlib=on to see
+# the fix.
+#
 # Usage:
-#   ./repro.sh [arch] [source] [user] [startup]
+#   ./repro.sh [arch] [source] [user] [startup] [comlib]
 #     arch    = auto (default: matches the host) | arm64 | amd64
 #     source  = pypi (default)  | main       (main = GitHub tarball of pyprod)
 #     user    = root (default)  | irisowner  (pyprod CI runs as root: --user 0:0)
 #     startup = entrypoint (default) | cistart
 #               (cistart = bare `iris start` as irisowner, exactly like the CI job;
 #                entrypoint = the image's normal iris-main entrypoint)
+#     comlib  = off (default: reproduces #16000) | on (sets COMLIB → works)
 #
 # Output: "REPRODUCED (#16000)" or "NOT REPRODUCED (LoadStream OK)".
 # Exit codes: 0 = reproduced · 2 = not reproduced · 1 = test infrastructure failure.
 set -euo pipefail
 
-ARCH="${1:-auto}"; SOURCE="${2:-pypi}"; RUNAS="${3:-root}"; START="${4:-entrypoint}"
+ARCH="${1:-auto}"; SOURCE="${2:-pypi}"; RUNAS="${3:-root}"; START="${4:-entrypoint}"; COMLIB_MODE="${5:-off}"
 if [ "$ARCH" = "auto" ]; then
   case "$(uname -m)" in
     arm64|aarch64) ARCH=arm64 ;;
@@ -40,7 +47,9 @@ case "$SOURCE" in
   *) echo "invalid source: $SOURCE (pypi|main)"; exit 1 ;;
 esac
 
-echo "==> image=$IMG arch=$ARCH source=$SOURCE user=$RUNAS startup=$START host=$(uname -s)/$(uname -m)"
+COMLIB_EXPORT=""
+[ "$COMLIB_MODE" = "on" ] && COMLIB_EXPORT="export COMLIB=/usr/irissys/bin"
+echo "==> image=$IMG arch=$ARCH source=$SOURCE user=$RUNAS startup=$START comlib=$COMLIB_MODE host=$(uname -s)/$(uname -m)"
 docker rm -f "$NAME" >/dev/null 2>&1 || true
 
 if [ "$START" = "cistart" ]; then
@@ -69,6 +78,7 @@ out=$(docker exec -u "$RUNAS" "$NAME" bash -c "
 export IRISINSTALLDIR=/usr/irissys LD_LIBRARY_PATH=/usr/irissys/bin:/usr/irissys/dev
 export IRISUSERNAME=superuser IRISPASSWORD=SYS IRISNAMESPACE=ENSEMBLE
 export PYTHONPATH=/usr/irissys/lib/python
+$COMLIB_EXPORT
 python3 -m pip install --quiet --break-system-packages '$PKG' >/dev/null 2>&1
 export PATH=\$HOME/.local/bin:/root/.local/bin:\$PATH
 echo '── environment:' \$(uname -m) \$(python3 --version 2>&1) 'pyprod' \$(python3 -m pip show intersystems-pyprod 2>/dev/null | awk '/^Version/{print \$2}')

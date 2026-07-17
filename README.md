@@ -6,6 +6,27 @@ generated class through `%SYSTEM.OBJ.LoadStream`, while the **same generated
 class compiles cleanly** when loaded from a file (`--manual -o` +
 `$SYSTEM.OBJ.Load`).
 
+## ✅ ROOT CAUSE — solved (2026-07-17)
+
+The trigger is the **absence of the `COMLIB` environment variable**
+(`COMLIB=/usr/irissys/bin`). Identified by the pyprod maintainer after this
+repo isolated every other variable. Verified both ways in the same container:
+
+```
+with    COMLIB=/usr/irissys/bin  → Load finished successfully.
+without COMLIB                   → ERROR #16000 Internal compiler error
+```
+
+The pyprod CI exports `COMLIB` in its workflow, which is why it always passed;
+the variable was not listed in the documented prerequisites, which is why every
+environment without it failed — regardless of architecture, image, edition,
+user or Python build. This repo now serves as a **regression test**:
+
+```bash
+./repro.sh                              # comlib=off → REPRODUCED (#16000)
+./repro.sh auto pypi root entrypoint on # comlib=on  → NOT REPRODUCED (works)
+```
+
 ## TL;DR
 
 ```bash
@@ -44,15 +65,12 @@ each dimension is a flag of `repro.sh`:
 | Python | image system 3.12, venv, standalone CPython 3.12 (uv) | `#16000` on **all three** |
 | Image/edition | `intersystems/iris-community:2026.1` (CI image), `intersystemsdc/iris-community:2025.3`, `irepo .../iris:2025.1`, `irepo .../iris:2026.1` | `#16000` on **all** (so not IRIS-for-Health vs IRIS, not irepo vs regular) |
 
-Every cell fails on **Docker Desktop for macOS** (LinuxKit VM — the emulated
-amd64 runs through it as well). The pyprod CI passes on **native Linux
-runners**. After eliminating everything above, the host virtualization layer
-is the remaining differential.
-
-**The decisive test:** run `./repro.sh` on a native Linux box. If it prints
-`NOT REPRODUCED`, the trigger is isolated to the Docker Desktop/macOS layer —
-which still matters: that is the daily environment of every Mac-based
-developer using pyprod.
+Every cell above failed identically — which is what pointed away from
+environment differences and (with the maintainer's eye on the CI workflow)
+led to the actual differential: the `COMLIB` env var, exported by the CI but
+absent from all failing environments. The "host layer" hypothesis this matrix
+originally suggested was wrong; the matrix's value was eliminating everything
+else.
 
 ## Proof logs
 
@@ -95,10 +113,11 @@ openat("…/Temp/<name>.xml", O_RDWR|O_NOCTTY|O_NONBLOCK)  = 7           ← sub
 
 So `ERROR #16008 "Unable to save text"` is literal: the read/write open of the
 temp file happens **before** the create+write step, fails with `ENOENT`, and by
-the time the file is actually materialized the error has already been raised —
-an ordering issue in the temp-file handoff that is environment-sensitive
-(triggers under Docker Desktop's LinuxKit kernel, apparently not on native
-Linux runners).
+the time the file is actually materialized the error has already been raised.
+With the root cause known, this timeline is the *mechanism*: without `COMLIB`
+the save-text step takes the open-without-create path first. The trace remains
+useful as engineering evidence for a friendlier failure mode (e.g. an explicit
+"COMLIB is not set" check instead of `#16000`).
 
 Also ruled out on this host (all captured in `logs/forensics-watcher.log`):
 
